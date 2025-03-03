@@ -16,9 +16,9 @@ env:
   ALIYUN_USERNAME: ${{ secrets.ALIYUN_REGISTRY_USER }}
   ALIYUN_PASSWORD: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
   ALIYUN_REGISTRY: ${{ secrets.ALIYUN_REGISTRY }}
-  ALIYUN_NAMESPACE: ${{ secrets.ALIYUN_NAMESPACE }}
-  DIFY_WEB_IMAGE_NAME: ${{ vars.DIFY_WEB_IMAGE_NAME || format('registry.cn-hangzhou.aliyuncs.com/{0}/dify-web', secrets.ALIYUN_NAMESPACE) }}
-  DIFY_API_IMAGE_NAME: ${{ vars.DIFY_API_IMAGE_NAME || format('registry.cn-hangzhou.aliyuncs.com/{0}/dify-api', secrets.ALIYUN_NAMESPACE) }}
+  ALIYUN_NAMESPACE: ${{ secrets.ALIYUN_NAME_SPACE }}
+  DIFY_WEB_IMAGE_NAME: ${{ vars.DIFY_WEB_IMAGE_NAME || format('registry.cn-hangzhou.aliyuncs.com/{0}/dify-web', secrets.ALIYUN_NAME_SPACE) }}
+  DIFY_API_IMAGE_NAME: ${{ vars.DIFY_API_IMAGE_NAME || format('registry.cn-hangzhou.aliyuncs.com/{0}/dify-api', secrets.ALIYUN_NAME_SPACE) }}
 
 jobs:
   build:
