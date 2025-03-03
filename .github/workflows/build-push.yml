@@ -13,15 +13,16 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  DIFY_WEB_IMAGE_NAME: ${{ vars.DIFY_WEB_IMAGE_NAME || 'langgenius/dify-web' }}
-  DIFY_API_IMAGE_NAME: ${{ vars.DIFY_API_IMAGE_NAME || 'langgenius/dify-api' }}
+  ALIYUN_USERNAME: ${{ secrets.ALIYUN_USERNAME }}
+  ALIYUN_PASSWORD: ${{ secrets.ALIYUN_PASSWORD }}
+  ALIYUN_REGISTRY: registry.cn-hangzhou.aliyuncs.com
+  ALIYUN_NAMESPACE: ${{ secrets.ALIYUN_NAMESPACE }}
+  DIFY_WEB_IMAGE_NAME: ${{ vars.DIFY_WEB_IMAGE_NAME || format('registry.cn-hangzhou.aliyuncs.com/{0}/dify-web', secrets.ALIYUN_NAMESPACE) }}
+  DIFY_API_IMAGE_NAME: ${{ vars.DIFY_API_IMAGE_NAME || format('registry.cn-hangzhou.aliyuncs.com/{0}/dify-api', secrets.ALIYUN_NAMESPACE) }}
 
 jobs:
   build:
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'arm64_runner' || 'ubuntu-latest' }}
-    if: github.repository == 'langgenius/dify'
     strategy:
       matrix:
         include:
@@ -48,12 +49,13 @@ jobs:
           platform=${{ matrix.platform }}
           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
-      - name: Login to Docker Hub
+      - name: Login to Aliyun Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ env.DOCKERHUB_USER }}
-          password: ${{ env.DOCKERHUB_TOKEN }}
-
+          registry: ${{ env.ALIYUN_REGISTRY }}
+          username: ${{ env.ALIYUN_USERNAME }}
+          password: ${{ env.ALIYUN_PASSWORD }}
+          
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -97,7 +99,6 @@ jobs:
   create-manifest:
     needs: build
     runs-on: ubuntu-latest
-    if: github.repository == 'langgenius/dify'
     strategy:
       matrix:
         include:
@@ -115,11 +116,13 @@ jobs:
           pattern: digests-${{ matrix.context }}-*
           merge-multiple: true
 
-      - name: Login to Docker Hub
+      - name: Login to Aliyun Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ env.DOCKERHUB_USER }}
-          password: ${{ env.DOCKERHUB_TOKEN }}
+          registry: ${{ env.ALIYUN_REGISTRY }}
+          username: ${{ env.ALIYUN_USERNAME }}
+          password: ${{ env.ALIYUN_PASSWORD }}
+
 
       - name: Extract metadata for Docker
         id: meta
